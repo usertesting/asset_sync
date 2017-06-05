@@ -206,20 +206,20 @@ module AssetSync
       local_files_to_upload = local_files - ignored_files + always_upload_files
       local_files_to_upload = local_files_to_upload - remote_files unless (ignore_existing_remote_files? || self.config.concurrent_uploads)
       local_files_to_upload = (local_files_to_upload + get_non_fingerprinted(local_files_to_upload)).uniq
-      # keep track of threads for uploading
-      threads = ThreadGroup.new
+      pool = Concurrent::FixedThreadPool.new(8)
 
       # Upload new files
       local_files_to_upload.each do |f|
         next unless File.file? "#{path}/#{f}" # Only files.
         if self.config.concurrent_uploads
-          threads.add(Thread.new { upload_file f unless bucket.files.head(f) })
+          pool.post { upload_file f unless bucket.files.head(f) }
         else
           upload_file f
         end
       end
 
-      sleep 1 while threads.list.any? # wait for threads to finish uploading
+      pool.shutdown
+      pool.wait_for_termination
 
       if self.config.cdn_distribution_id && files_to_invalidate.any?
         log "Invalidating Files"

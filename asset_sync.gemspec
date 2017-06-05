@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency("fog-core")
   s.add_dependency('unf')
+  s.add_dependency('concurrent-ruby')
   s.add_dependency('activemodel', ">= 4.1.0")
   s.add_dependency('mime-types', ">= 2.99")
 
