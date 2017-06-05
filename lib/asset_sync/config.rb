@@ -67,7 +67,7 @@ module AssetSync
       self.enabled = true
       self.run_on_precompile = true
       self.cdn_distribution_id = nil
-      self.concurrent_uploads = true
+      self.concurrent_uploads = false
       self.invalidate = []
       self.cache_asset_regexps = []
       load_yml! if defined?(::Rails) && yml_exists?
